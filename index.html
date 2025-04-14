@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>JamWich POS</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      height: 100vh;
+      background-color: #FFAC1C;
+      color: #333;
+    }
+
+    .menu-panel, .order-panel {
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .menu-panel {
+      width: 70%;
+      background-color: #CC5500;
+    }
+
+    .order-panel {
+      width: 30%;
+      background-color: #f6b832;
+      border-left: 2px solid #f5ab3b;
+      display: flex;
+      flex-direction: column;
+    }
+
+    h2 {
+      margin-bottom: 16px;
+      font-size: 24px;
+      color: #db7346;
+    }
+
+    .menu-search input {
+      width: 100%;
+      padding: 12px;
+      font-size: 1em;
+      border: 1px solid #ce3636;
+      border-radius: 8px;
+      margin-bottom: 24px;
+    }
+
+    .menu-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .menu-card {
+      background-color: #dc8d44;
+      width: 120px;
+      border-radius: 10px;
+      overflow: hidden;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      transition: transform 0.2s ease;
+    }
+
+    .menu-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .menu-card img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+    }
+
+    .menu-card h3 {
+      margin: 10px 0 5px;
+      font-size: 16px;
+      color: #e61111;
+    }
+
+    .menu-card p {
+      margin: 0;
+      color: #888;
+      font-size: 14px;
+    }
+
+    .menu-card input {
+      width: 50px;
+      margin: 10px 0;
+      padding: 4px;
+      font-size: 1em;
+    }
+
+    .menu-card button {
+      background-color: #2b1505;
+      color: white;
+      padding: 8px 10px;
+      border: none;
+      width: 100%;
+      cursor: pointer;
+      font-weight: bold;
+      border-radius: 0 0 10px 10px;
+    }
+
+    .menu-card button:hover {
+      background-color: #8c5a32;
+    }
+
+    .ordered-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+      font-size: 15px;
+    }
+
+    .total {
+      margin: 20px 0;
+      font-size: 18px;
+      font-weight: 600;
+      color: #3d3d3d;
+    }
+
+    .payment-input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 1em;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+    }
+
+    .pay-btn, .print-btn {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      font-size: 1em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 10px;
+      border-radius: 8px;
+    }
+
+    .pay-btn {
+      background-color: #050500;
+      color: white;
+    }
+
+    .pay-btn:hover {
+      background-color: #db7541;
+    }
+
+    .print-btn {
+      background-color:  #050301;
+      color: white;
+    }
+
+    .print-btn:hover {
+      background-color: #fafafa;
+    }
+
+    h3 {
+      color: #d29e37;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="menu-panel">
+    <h2>JAMWICH!</h2>
+    <div class="menu-search">
+      <input type="text" id="search" placeholder="Search menu...">
+    </div>
+    <div id="menu-container"></div>
+  </div>
+
+  <div class="order-panel">
+    <h2>Ordered Items</h2>
+    <div id="order-list"></div>
+    <div class="total" id="total">Total: 0 USD</div>
+    <input class="payment-input" id="payment" type="number" placeholder="Enter payment amount">
+    <button class="pay-btn" onclick="payNow()">Pay</button>
+  </div>
+ 
+  <script>
+    const menuItems = [
+      { name: 'Cluck Me Daddy', price: 11.75, image: 'img/SW1.jpg', category: 'sandwich'},
+      { name: 'The Bisexual Tuna Melt', price: 10.50, image: 'img/SW2.jpg', category: 'sandwich'},
+      { name: 'PB&Slay', price: 8.50, image: 'img/SW3.jpg', category: 'sandwich'},
+      { name: 'Garden Of Eatin', price: 10.25, image: 'img/SW4.jpg', category: 'sandwich'},
+      { name: 'Ham-osexual', price: 11.00, image: 'img/SW5.jpg', category: 'sandwich'},
+      { name: 'The Beef Supreme', price: 12.50, image: 'img/SW6.jpg', category: 'sandwich'},
+      { name: 'Daddy Pastrami', price: 13.25, image: 'img/SW7.jpg', category: 'sandwich'},
+      { name: 'Caprese but Make It Camp', price: 10.75, image: 'img/SW8.jpg', category: 'sandwich'},
+      { name: 'Italian Twink Sub', price: 12.00, image: 'img/SW9.jpg', category: 'sandwich'},
+      { name: 'Yasss Brunch Queen', price: 9.95, image: 'img/SW10.jpg', category: 'sandwich'}
+    ];
+
+    let order = [];
+
+    function renderMenu(filteredMenu = menuItems) {
+      const container = document.getElementById('menu-container');
+      container.innerHTML = '';
+
+      const categories = {
+        sandwich: []
+      };
+
+      filteredMenu.forEach(item => {
+        if (categories[item.category]) {
+          categories[item.category].push(item);
+        }
+      });
+
+      Object.keys(categories).forEach(category => {
+        if (categories[category].length > 0) {
+          const categoryTitle = document.createElement('h3');
+          categoryTitle.textContent = category.toUpperCase();
+          container.appendChild(categoryTitle);
+
+          const grid = document.createElement('div');
+          grid.className = 'menu-grid';
+
+          categories[category].forEach((item, index) => {
+            const realIndex = menuItems.findIndex(i => i.name === item.name);
+            const card = document.createElement('div');
+            card.className = 'menu-card';
+            card.innerHTML = `
+              <img src="${item.image}" alt="${item.name}">
+              <h3>${item.name}</h3>
+              <p>${item.price} USD</p>
+              <input id="qty-${realIndex}" type="number" value="0" min="0">
+              <button onclick="addToOrder(${realIndex})">Add to order</button>
+            `;
+            grid.appendChild(card);
+          });
+
+          container.appendChild(grid);
+        }
+      });
+    }
+
+    function addToOrder(index) {
+      const quantity = parseInt(document.getElementById(`qty-${index}`).value);
+      const item = menuItems[index];
+      const existing = order.find(i => i.name === item.name);
+      if (existing) {
+        existing.qty += quantity;
+      } else {
+        order.push({ ...item, qty: quantity });
+      }
+      renderOrder();
+    }
+
+    function renderOrder() {
+      const list = document.getElementById('order-list');
+      const totalEl = document.getElementById('total');
+      list.innerHTML = '';
+      let total = 0;
+      order.forEach(item => {
+        total += item.price * item.qty;
+        const row = document.createElement('div');
+        row.className = 'ordered-item';
+        row.innerHTML = `
+          <span>${item.name}</span>
+          <span>Qty: ${item.qty}</span>
+        `;
+        list.appendChild(row);
+      });
+      totalEl.textContent = `Total: ${total} USD`;
+    }
+
+    function payNow() {
+      const payment = parseInt(document.getElementById('payment').value);
+      const total = order.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const change = payment - total;
+
+      if (change >= 0) {
+        alert(`Slay the Day with JamWich Sandwich on the way!👠 Here's your ${change} USD change`);
+        order = [];
+        renderOrder();
+        document.getElementById('payment').value = '';
+      } else {
+        alert("Insufficient payment.");
+      }
+    }
+
+    function printReceipt() {
+      let receiptText = "Receipt - JamWich\n\n";
+      order.forEach(item => {
+        receiptText += `${item.name} x${item.qty} - ${item.price * item.qty} USD\n`;
+      });
+      const total = order.reduce((sum, i) => sum + i.qty * i.price, 0);
+      receiptText += `\nTotal: ${total} USD`;
+
+      const win = window.open('', '', 'width=400,height=600');
+      win.document.write(`<pre>${receiptText}</pre>`);
+      win.document.close();
+      win.print();
+    }
+
+    document.getElementById('search').addEventListener('input', function () {
+      const keyword = this.value.toLowerCase();
+      const filtered = menuItems.filter(item => item.name.toLowerCase().includes(keyword));
+      renderMenu(filtered);
+    });
+
+    renderMenu();
+  </script>
+
+</body>
+</html>
